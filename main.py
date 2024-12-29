@@ -52,7 +52,7 @@ class TuringPattern(object):
                                       + np.roll(in_array, 1, axis=1)
                                       + np.roll(in_array, -1, axis=1))
         # out_array = -mu * (sum_direction_array - 4 * self.U) / 4
-        out_array = sum_direction_array - self.U
+        out_array = sum_direction_array - in_array
         return out_array
 
     def run_epoch_difference(self):
@@ -94,7 +94,7 @@ feed_rate = 0.055
 kill_rate = 0.062
 sizex = 128
 sizey = 128
-epoch = 1000
+epoch = 100000
 T = TuringPattern(sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch)
 
 T.run_difference()
