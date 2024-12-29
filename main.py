@@ -18,6 +18,7 @@ class TuringPattern(object):
         self.V[50:60, 50:70] = 1
         self.V[60:80, 70:80] = 1
 
+    # 拉普拉斯算子
     def laplacian(self,in_array):
         center = -in_array
         direct_neighbors = 0.20 * (
