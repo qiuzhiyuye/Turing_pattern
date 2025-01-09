@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 
 
 class TuringPattern(object):
-    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation, name):
+    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation, name,process):
         self.sizex = sizex
         self.sizey = sizey
         self.dx = dx
@@ -17,6 +17,7 @@ class TuringPattern(object):
         self.epoch = epoch
         self.equation = equation
         self.name = name
+        self.process = process
 
         self.U = np.ones((sizex, sizey), dtype=float)
         self.V = np.zeros((sizex, sizey), dtype=float)
@@ -67,6 +68,17 @@ class TuringPattern(object):
     def run_difference(self):
         for run_time in range(self.epoch):
             self.run_epoch_difference()
+            if self.process and (run_time % 100 == 0):
+                self.show_process(run_time)  # 保存每轮迭代后的图像
+
+    def show_process(self, run_time):
+        plt.imshow(self.V, cmap="plasma", interpolation="nearest")
+        plt.colorbar()
+        s = f"{self.name}_final_TuringPattern_epoch_{run_time}.png"
+        plt.title(s)
+        # plt.show()
+        plt.pause(0.001)
+        plt.clf()
 
     def run_epoch(self):
         laplacian_u = self.laplacian(self.U)
@@ -82,7 +94,7 @@ class TuringPattern(object):
         for run_time in range(self.epoch):
             self.run_epoch()
 
-    def show(self):
+    def show_result(self):
         plt.imshow(self.V, cmap="plasma", interpolation="nearest")
         plt.colorbar()
         s = self.name + " final TuringPattern"
@@ -105,10 +117,21 @@ class TuringPattern(object):
         return ani
 
 
-T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 10000, "Gray-Scott", "leopard print")
+# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 20000, "Gray-Scott", "leopard print",True)
 
-# T.run_difference()
+# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.026, 0.061, 10000, "Gray-Scott", "leopard print",False)
+
+# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.0343, 0.0618, 100000, "Gray-Scott", "苏眉鱼纹路1",True)
+
+# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  #效果不错
+
+# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "巨蜥",True)
+
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  
+
+
 # T.run()
-# T.show()
 
-ani = T.create_animation()
+T.run_difference()
+T.show_result()
+# ani = T.create_animation()
