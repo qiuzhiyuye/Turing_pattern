@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
 
 class TuringPattern(object):
-    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch):
+    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation,name):
         self.sizex = sizex
         self.sizey = sizey
         self.dx = dx
@@ -13,6 +14,8 @@ class TuringPattern(object):
         self.feed_rate = feed_rate
         self.kill_rate = kill_rate
         self.epoch = epoch
+        self.equation = equation
+        self.name = name
 
         self.U = np.ones((sizex, sizey), dtype=float)
         self.V = np.zeros((sizex, sizey), dtype=float)
@@ -40,10 +43,12 @@ class TuringPattern(object):
         return out_array
 
     def f_function(self):
-        return - self.U * self.V ** 2 + self.feed_rate * (1 - self.U)
+        if(self.equation == "Gray-Scott"):
+            return - self.U * self.V ** 2 + self.feed_rate * (1 - self.U)
 
     def g_function(self):
-        return self.U * self.V ** 2 - (self.kill_rate + self.feed_rate) * self.V
+        if(self.equation == "Gray-Scott"):
+            return self.U * self.V ** 2 - (self.kill_rate + self.feed_rate) * self.V
 
     def difference_method(self, in_array):
         # mu = self.dt / self.dx ** 2
@@ -60,9 +65,24 @@ class TuringPattern(object):
         self.V += self.dt * (self.Dv * self.difference_method(self.V) + self.g_function())
 
     # 有限差分迭代计算
+    # def run_difference(self):
+    #     for run_time in range(self.epoch):
+    #         self.run_epoch_difference()
+
     def run_difference(self):
-        for run_time in range(epoch):
+        for run_time in range(self.epoch):
             self.run_epoch_difference()
+            if run_time % 100 == 0:
+                self.show_process(run_time)  # 保存每轮迭代后的图像
+
+    def show_process(self, run_time):
+        plt.imshow(self.V, cmap="plasma", interpolation="nearest")
+        plt.colorbar()
+        s = f"{self.name}_final_TuringPattern_epoch_{run_time}.png"
+        plt.title(s)
+        # plt.show()
+        plt.pause(0.01)
+        plt.clf()
 
     def run_epoch(self):
         laplacian_u = self.laplacian(self.U)
@@ -75,27 +95,31 @@ class TuringPattern(object):
         self.V += self.dt * deltaV
 
     def run(self):
-        for run_time in range(epoch):
+        for run_time in range(self.epoch):
             self.run_epoch()
 
     def show(self):
         plt.imshow(self.V, cmap="plasma", interpolation="nearest")
         plt.colorbar()
-        s = "final TuringPattern"
+        s = self.name+"final TuringPattern"
         plt.title(s)
         plt.show()
 
+# dx = 1
+# dt = 0.25
+# Du = 1
+# Dv = 0.5
+# feed_rate = 0.055
+# kill_rate = 0.062
+# feed_rate = 0.039
+# kill_rate = 0.058
+# sizex = 128
+# sizey = 128
+# epoch = 100000
+# T = TuringPattern(sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch)
 
-dx = 1
-dt = 0.25
-Du = 1
-Dv = 0.5
-feed_rate = 0.055
-kill_rate = 0.062
-sizex = 128
-sizey = 128
-epoch = 100000
-T = TuringPattern(sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch)
+T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 100000,"Gray-Scott","leopard print")
 
 T.run_difference()
+# T.run()
 T.show()
