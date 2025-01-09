@@ -21,8 +21,11 @@ class TuringPattern(object):
 
         self.U = np.ones((sizex, sizey), dtype=float)
         self.V = np.zeros((sizex, sizey), dtype=float)
-        self.V[50:60, 50:70] = 1
-        self.V[60:80, 70:80] = 1
+        # self.V[50:60, 50:70] = 1
+        # self.V[60:80, 70:80] = 1
+        lenth=self.sizex//10
+        self.V[self.sizex//2-lenth:self.sizex//2,self.sizex//2-lenth:self.sizex//2+lenth]=1
+        self.V[self.sizex//2:self.sizex//2+lenth*2,self.sizex//2+lenth:self.sizex//2+lenth*2]=1
 
     # 拉普拉斯算子
     # 通过中心点周围8个点对其下一时刻值进行更新
@@ -70,6 +73,7 @@ class TuringPattern(object):
             self.run_epoch_difference()
             if self.process and (run_time % 100 == 0):
                 self.show_process(run_time)  # 保存每轮迭代后的图像
+            # break
 
     def show_process(self, run_time):
         plt.imshow(self.V, cmap="plasma", interpolation="nearest")
@@ -117,15 +121,15 @@ class TuringPattern(object):
         return ani
 
 
-# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 20000, "Gray-Scott", "leopard print",True)
+T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "leopard print",True)
 
-# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.026, 0.061, 10000, "Gray-Scott", "leopard print",False)
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.026, 0.061, 30000, "Gray-Scott", "leopard print",True)
 
-# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.0343, 0.0618, 100000, "Gray-Scott", "苏眉鱼纹路1",True)
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0343, 0.0618, 50000, "Gray-Scott", "苏眉鱼纹路1",True)
 
 # T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  #效果不错
 
-# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "巨蜥",True)
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "巨蜥",True)
 
 # T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  
 
