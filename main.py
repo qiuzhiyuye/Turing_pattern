@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
+import matplotlib.animation as animation
 
 
 class TuringPattern(object):
-    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation,name):
+    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation, name):
         self.sizex = sizex
         self.sizey = sizey
         self.dx = dx
@@ -43,20 +44,18 @@ class TuringPattern(object):
         return out_array
 
     def f_function(self):
-        if(self.equation == "Gray-Scott"):
+        if self.equation == "Gray-Scott":
             return - self.U * self.V ** 2 + self.feed_rate * (1 - self.U)
 
     def g_function(self):
-        if(self.equation == "Gray-Scott"):
+        if self.equation == "Gray-Scott":
             return self.U * self.V ** 2 - (self.kill_rate + self.feed_rate) * self.V
 
     def difference_method(self, in_array):
-        # mu = self.dt / self.dx ** 2
         sum_direction_array = 0.25 * (np.roll(in_array, 1, axis=0)
                                       + np.roll(in_array, -1, axis=0)
                                       + np.roll(in_array, 1, axis=1)
                                       + np.roll(in_array, -1, axis=1))
-        # out_array = -mu * (sum_direction_array - 4 * self.U) / 4
         out_array = sum_direction_array - in_array
         return out_array
 
@@ -65,24 +64,9 @@ class TuringPattern(object):
         self.V += self.dt * (self.Dv * self.difference_method(self.V) + self.g_function())
 
     # 有限差分迭代计算
-    # def run_difference(self):
-    #     for run_time in range(self.epoch):
-    #         self.run_epoch_difference()
-
     def run_difference(self):
         for run_time in range(self.epoch):
             self.run_epoch_difference()
-            if run_time % 100 == 0:
-                self.show_process(run_time)  # 保存每轮迭代后的图像
-
-    def show_process(self, run_time):
-        plt.imshow(self.V, cmap="plasma", interpolation="nearest")
-        plt.colorbar()
-        s = f"{self.name}_final_TuringPattern_epoch_{run_time}.png"
-        plt.title(s)
-        # plt.show()
-        plt.pause(0.01)
-        plt.clf()
 
     def run_epoch(self):
         laplacian_u = self.laplacian(self.U)
@@ -101,25 +85,30 @@ class TuringPattern(object):
     def show(self):
         plt.imshow(self.V, cmap="plasma", interpolation="nearest")
         plt.colorbar()
-        s = self.name+"final TuringPattern"
+        s = self.name + " final TuringPattern"
         plt.title(s)
         plt.show()
 
-# dx = 1
-# dt = 0.25
-# Du = 1
-# Dv = 0.5
-# feed_rate = 0.055
-# kill_rate = 0.062
-# feed_rate = 0.039
-# kill_rate = 0.058
-# sizex = 128
-# sizey = 128
-# epoch = 100000
-# T = TuringPattern(sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch)
+    def animate(self, i):
+        self.run_epoch_difference()
+        self.im.set_array(self.V)
+        return [self.im]
 
-T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 100000,"Gray-Scott","leopard print")
+    def create_animation(self):
+        fig, ax = plt.subplots()
+        self.im = ax.imshow(self.V, cmap="plasma", interpolation="nearest")
+        plt.colorbar(self.im)
+        s = self.name + " TuringPattern Animation"
+        plt.title(s)
+        ani = animation.FuncAnimation(fig, self.animate, frames=self.epoch, interval=0.01, blit=True)
+        plt.show()
+        return ani
 
-T.run_difference()
+
+T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 10000, "Gray-Scott", "leopard print")
+
+# T.run_difference()
 # T.run()
-T.show()
+# T.show()
+
+ani = T.create_animation()
