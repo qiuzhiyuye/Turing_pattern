@@ -89,24 +89,28 @@ class TuringPattern(object):
         for i in range(in_array.shape[0]):
             if i == 0:
                 # 外向递推 Un1 = 2Un-Un_1得到-1
-                temp_array[i, :] += (in_array[i, :] * 2 - in_array[i + 1, :]) + in_array[i + 1, :]
+                # temp_array[i, :] += (in_array[i, :] * 2 - in_array[i + 1, :]) + in_array[i + 1, :]
+                temp_array[i, :] += 2*in_array[i, :]
             elif i == in_array.shape[0] - 1:
-                temp_array[i, :] += (in_array[i, :] * 2 - in_array[i - 1, :]) + in_array[i - 1, :]
+                # temp_array[i, :] += (in_array[i, :] * 2 - in_array[i - 1, :]) + in_array[i - 1, :]
+                temp_array[i, :] += 2*in_array[i, :]
             else:
                 temp_array[i, :] += (in_array[i - 1, :] + in_array[i + 1, :])
         for i in range(in_array.shape[1]):
             if i == 0:
                 # 外向递推 Un1 = 2Un-Un_1得到-1
-                temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i + 1]) + in_array[:, i + 1]
+                # temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i + 1]) + in_array[:, i + 1]
+                temp_array[:, i] += 2*in_array[:, i]
             elif i == in_array.shape[1] - 1:
-                temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i - 1]) + in_array[:, i - 1]
+                # temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i - 1]) + in_array[:, i - 1]
+                temp_array[:, i] += 2*in_array[:, i]
             else:
                 temp_array[:, i] += (in_array[:, i - 1] + in_array[:, i + 1])
         sum_direction_array = 0.25 * (np.roll(in_array, 1, axis=0)
                                       + np.roll(in_array, -1, axis=0)
                                       + np.roll(in_array, 1, axis=1)
                                       + np.roll(in_array, -1, axis=1))
-        out_array = sum_direction_array - 0.25 * temp_array
+        out_array = temp_array*0.25 - in_array
         return out_array
 
     def run_epoch_difference(self):
