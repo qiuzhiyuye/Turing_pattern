@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import matplotlib.animation as animation
-
+from matplotlib.colors import ListedColormap
+from scipy.ndimage import gaussian_filter, binary_erosion, binary_dilation, label
 
 class TuringPattern(object):
     def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation, name, process):
@@ -30,7 +31,7 @@ class TuringPattern(object):
             # center_x, center_y = self.sizex // 2, self.sizey // 2
             center_x, center_y = 0, 0
             x, y = np.ogrid[:self.sizex, :self.sizey]
-            radius = self.sizex // 5
+            radius = self.sizex // 3*2
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 1
             radius = radius - 5
@@ -51,6 +52,40 @@ class TuringPattern(object):
             radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 1
+            radius = radius - 5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 0
+            radius = radius - 5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+            radius = radius - 5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 0
+            radius = radius - 5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+            radius = radius - 5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 0
+            radius = radius - 5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+        elif (self.name == 'monitor'):
+            num_points = 25
+            points = set()
+            min_distance = 25  # 确保点之间的最小距离
+            edge_distance = 40
+            while len(points) < num_points:
+                print(len(points))
+                x = np.random.randint(edge_distance, self.sizex - edge_distance)
+                y = np.random.randint(edge_distance, self.sizey - edge_distance)
+                if all(np.sqrt((x - px) ** 2 + (y - py) ** 2) > min_distance for px, py in points): 
+                    points.add((x, y))  
+                    center_x, center_y = x,y
+                    x, y = np.ogrid[:self.sizex, :self.sizey]
+                    radius = 3
+                    mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+                    self.V[mask] = 1
         else:
             lenth = self.sizex // 10
             self.V[self.sizex // 2 - lenth:self.sizex // 2, self.sizex // 2 - lenth:self.sizex // 2 + lenth] = 1
@@ -163,12 +198,16 @@ class TuringPattern(object):
         return [self.im]
 
     def create_animation(self):
+        cmap = ListedColormap(['black', 'white'])
         fig, ax = plt.subplots()
-        self.im = ax.imshow(self.V, cmap="plasma", interpolation="nearest")
+        if(self.name == "zebra"):
+            self.im = ax.imshow(self.V, cmap='gray_r', interpolation="nearest")
+        else:
+            self.im = ax.imshow(self.V, cmap='plasma', interpolation="nearest")
         plt.colorbar(self.im)
         s = self.name + " TuringPattern Animation"
         plt.title(s)
-        ani = animation.FuncAnimation(fig, self.animate, frames=self.epoch, interval=0.01, blit=True)
+        ani = animation.FuncAnimation(fig, self.animate, frames=self.epoch//200, interval=0.01, blit=True)
         plt.show()
         return ani
 
@@ -179,13 +218,11 @@ class TuringPattern(object):
 
 # T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.026, 0.061, 30000, "Gray-Scott", "leopard print",True)
 
-# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0343, 0.0618, 50000, "Gray-Scott", "苏眉鱼纹路1",True)
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0343, 0.0618, 50000, "Gray-Scott", "Su Mei Fish",True)
 
-# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  #效果不错
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "Su Mei Fish",True)  
 
-T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "巨蜥",True)
-
-# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  
+T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "monitor",True)
 
 
 # T.run()
