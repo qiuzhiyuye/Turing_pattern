@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 
 
 class TuringPattern(object):
-    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation, name,process):
+    def __init__(self, sizex, sizey, dx, dt, Du, Dv, feed_rate, kill_rate, epoch, equation, name, process):
         self.sizex = sizex
         self.sizey = sizey
         self.dx = dx
@@ -26,35 +26,35 @@ class TuringPattern(object):
         self.Initial()
 
     def Initial(self):
-        if(self.name=='zebra'):
+        if (self.name == 'zebra'):
             # center_x, center_y = self.sizex // 2, self.sizey // 2
-            center_x, center_y = 0,0
-            y, x = np.ogrid[:self.sizex, :self.sizey]
-            radius=self.sizex//5
+            center_x, center_y = 0, 0
+            x, y = np.ogrid[:self.sizex, :self.sizey]
+            radius = self.sizex // 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 1
-            radius=radius-5
+            radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 0
-            radius=radius-5
+            radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 1
-            radius=radius-5
+            radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 0
-            radius=radius-5
+            radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 1
-            radius=radius-5
+            radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 0
-            radius=radius-5
+            radius = radius - 5
             mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
             self.V[mask] = 1
         else:
-            lenth=self.sizex//10
-            self.V[self.sizex//2-lenth:self.sizex//2,self.sizex//2-lenth:self.sizex//2+lenth]=1
-            self.V[self.sizex//2:self.sizex//2+lenth*2,self.sizex//2+lenth:self.sizex//2+lenth*2]=1
+            lenth = self.sizex // 10
+            self.V[self.sizex // 2 - lenth:self.sizex // 2, self.sizex // 2 - lenth:self.sizex // 2 + lenth] = 1
+            self.V[self.sizex // 2:self.sizex // 2 + lenth * 2, self.sizex // 2 + lenth:self.sizex // 2 + lenth * 2] = 1
 
     # 拉普拉斯算子
     # 通过中心点周围8个点对其下一时刻值进行更新
@@ -85,11 +85,28 @@ class TuringPattern(object):
             return self.U * self.V ** 2 - (self.kill_rate + self.feed_rate) * self.V
 
     def difference_method(self, in_array):
+        temp_array = np.zeros((self.sizex, self.sizey), dtype=float)
+        for i in range(in_array.shape[0]):
+            if i == 0:
+                # 外向递推 Un1 = 2Un-Un_1得到-1
+                temp_array[i, :] += (in_array[i, :] * 2 - in_array[i + 1, :]) + in_array[i + 1, :]
+            elif i == in_array.shape[0] - 1:
+                temp_array[i, :] += (in_array[i, :] * 2 - in_array[i - 1, :]) + in_array[i - 1, :]
+            else:
+                temp_array[i, :] += (in_array[i - 1, :] + in_array[i + 1, :])
+        for i in range(in_array.shape[1]):
+            if i == 0:
+                # 外向递推 Un1 = 2Un-Un_1得到-1
+                temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i + 1]) + in_array[:, i + 1]
+            elif i == in_array.shape[1] - 1:
+                temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i - 1]) + in_array[:, i - 1]
+            else:
+                temp_array[:, i] += (in_array[:, i - 1] + in_array[:, i + 1])
         sum_direction_array = 0.25 * (np.roll(in_array, 1, axis=0)
                                       + np.roll(in_array, -1, axis=0)
                                       + np.roll(in_array, 1, axis=1)
                                       + np.roll(in_array, -1, axis=1))
-        out_array = sum_direction_array - in_array
+        out_array = sum_direction_array - 0.25 * temp_array
         return out_array
 
     def run_epoch_difference(self):
@@ -102,8 +119,8 @@ class TuringPattern(object):
         #     self.run_epoch_difference()
         #     if self.process and (run_time % 100 == 0):
         #         self.show_process(run_time)  # 保存每轮迭代后的图像
-            # break
-        ani=self.create_animation()
+        # break
+        ani = self.create_animation()
 
     def show_process(self, run_time):
         plt.imshow(self.V, cmap="plasma", interpolation="nearest")
@@ -150,8 +167,9 @@ class TuringPattern(object):
         ani = animation.FuncAnimation(fig, self.animate, frames=self.epoch, interval=0.01, blit=True)
         plt.show()
         return ani
-    
-T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 6000, "Gray-Scott", "zebra",True)
+
+
+T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "zebra", True)
 
 # T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "leopard print",True)
 
