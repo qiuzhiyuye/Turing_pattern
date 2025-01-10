@@ -23,9 +23,38 @@ class TuringPattern(object):
         self.V = np.zeros((sizex, sizey), dtype=float)
         # self.V[50:60, 50:70] = 1
         # self.V[60:80, 70:80] = 1
-        lenth=self.sizex//10
-        self.V[self.sizex//2-lenth:self.sizex//2,self.sizex//2-lenth:self.sizex//2+lenth]=1
-        self.V[self.sizex//2:self.sizex//2+lenth*2,self.sizex//2+lenth:self.sizex//2+lenth*2]=1
+        self.Initial()
+
+    def Initial(self):
+        if(self.name=='zebra'):
+            # center_x, center_y = self.sizex // 2, self.sizey // 2
+            center_x, center_y = 0,0
+            y, x = np.ogrid[:self.sizex, :self.sizey]
+            radius=self.sizex//5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+            radius=radius-5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 0
+            radius=radius-5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+            radius=radius-5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 0
+            radius=radius-5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+            radius=radius-5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 0
+            radius=radius-5
+            mask = (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+            self.V[mask] = 1
+        else:
+            lenth=self.sizex//10
+            self.V[self.sizex//2-lenth:self.sizex//2,self.sizex//2-lenth:self.sizex//2+lenth]=1
+            self.V[self.sizex//2:self.sizex//2+lenth*2,self.sizex//2+lenth:self.sizex//2+lenth*2]=1
 
     # 拉普拉斯算子
     # 通过中心点周围8个点对其下一时刻值进行更新
@@ -69,11 +98,12 @@ class TuringPattern(object):
 
     # 有限差分迭代计算
     def run_difference(self):
-        for run_time in range(self.epoch):
-            self.run_epoch_difference()
-            if self.process and (run_time % 100 == 0):
-                self.show_process(run_time)  # 保存每轮迭代后的图像
+        # for run_time in range(self.epoch):
+        #     self.run_epoch_difference()
+        #     if self.process and (run_time % 100 == 0):
+        #         self.show_process(run_time)  # 保存每轮迭代后的图像
             # break
+        ani=self.create_animation()
 
     def show_process(self, run_time):
         plt.imshow(self.V, cmap="plasma", interpolation="nearest")
@@ -106,7 +136,8 @@ class TuringPattern(object):
         plt.show()
 
     def animate(self, i):
-        self.run_epoch_difference()
+        for step in range(200):
+            self.run_epoch_difference()
         self.im.set_array(self.V)
         return [self.im]
 
@@ -119,9 +150,10 @@ class TuringPattern(object):
         ani = animation.FuncAnimation(fig, self.animate, frames=self.epoch, interval=0.01, blit=True)
         plt.show()
         return ani
+    
+T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 6000, "Gray-Scott", "zebra",True)
 
-
-T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "leopard print",True)
+# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "leopard print",True)
 
 # T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.026, 0.061, 30000, "Gray-Scott", "leopard print",True)
 
@@ -137,5 +169,6 @@ T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", 
 # T.run()
 
 T.run_difference()
-T.show_result()
+# T.show_result()
+
 # ani = T.create_animation()
