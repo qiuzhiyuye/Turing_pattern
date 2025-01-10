@@ -89,21 +89,21 @@ class TuringPattern(object):
         for i in range(in_array.shape[0]):
             if i == 0:
                 # 外向递推 Un1 = 2Un-Un_1得到-1
-                # temp_array[i, :] += (in_array[i, :] * 2 - in_array[i + 1, :]) + in_array[i + 1, :]
-                temp_array[i, :] += 2*in_array[i, :]
+                temp_array[i, :] += (in_array[i, :] * 2 - in_array[i + 1, :]) + in_array[i + 1, :]
+                # temp_array[i, :] += 2*in_array[i, :]
             elif i == in_array.shape[0] - 1:
-                # temp_array[i, :] += (in_array[i, :] * 2 - in_array[i - 1, :]) + in_array[i - 1, :]
-                temp_array[i, :] += 2*in_array[i, :]
+                temp_array[i, :] += (in_array[i, :] * 2 - in_array[i - 1, :]) + in_array[i - 1, :]
+                # temp_array[i, :] += 2*in_array[i, :]
             else:
                 temp_array[i, :] += (in_array[i - 1, :] + in_array[i + 1, :])
         for i in range(in_array.shape[1]):
             if i == 0:
                 # 外向递推 Un1 = 2Un-Un_1得到-1
-                # temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i + 1]) + in_array[:, i + 1]
-                temp_array[:, i] += 2*in_array[:, i]
+                temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i + 1]) + in_array[:, i + 1]
+                # temp_array[:, i] += 2*in_array[:, i]
             elif i == in_array.shape[1] - 1:
-                # temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i - 1]) + in_array[:, i - 1]
-                temp_array[:, i] += 2*in_array[:, i]
+                temp_array[:, i] += (in_array[:, i] * 2 - in_array[:, i - 1]) + in_array[:, i - 1]
+                # temp_array[:, i] += 2*in_array[:, i]
             else:
                 temp_array[:, i] += (in_array[:, i - 1] + in_array[:, i + 1])
         sum_direction_array = 0.25 * (np.roll(in_array, 1, axis=0)
@@ -173,7 +173,7 @@ class TuringPattern(object):
         return ani
 
 
-T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "zebra", True)
+# T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "zebra", True)
 
 # T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", "leopard print",True)
 
@@ -183,7 +183,7 @@ T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.039, 0.058, 30000, "Gray-Scott", 
 
 # T = TuringPattern(128, 128, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  #效果不错
 
-# T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "巨蜥",True)
+T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.098, 0.0555, 20000, "Gray-Scott", "巨蜥",True)
 
 # T = TuringPattern(256, 256, 1, 0.25, 1, 0.5, 0.0517, 0.0628, 50000, "Gray-Scott", "苏眉鱼纹路2",True)  
 
